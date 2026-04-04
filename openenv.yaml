@@ -1,0 +1,12 @@
+
+action_space:
+  type: Discrete
+  size: 3
+  description: Work, Personal, Spam
+observation_space:
+  type: Box
+  shape: [10]
+  low: 0
+  high: 1
+  dtype: float32
+task_description: The agent needs to sort emails into 'Work', 'Personal', or 'Spam' categories based on a 10-dimensional observation. The reward is 1.0 for a correct classification and 0.0 for incorrect (or partial reward for advanced step function).
