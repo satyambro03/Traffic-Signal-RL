@@ -8,7 +8,7 @@ def run_baseline():
         state = env.reset()
         done = False
         while not done:
-            action = env.action_space.sample()  # random baseline
+            action = env.action_space.sample()  # random action
             state, reward, done, info = env.step(action)
             scores.append(reward)
     print("Average score:", np.mean(scores))
