@@ -43,12 +43,9 @@ The agent learns to optimize tasks such as email sorting and traffic signal cont
 - `inference.py` → Baseline agent (random actions, reproducible scores)  
 - `Dockerfile` → Deployment setup (Gymnasium + NumPy + PyYAML + Gradio)  
 - `README.md` → Documentation and hackathon notes  
+- `.gitattributes` → Optional file for repo consistency (line endings, linguist settings)  
 
 ## Setup
 ```bash
 pip install gymnasium numpy pyyaml gradio
 python inference.py
-
-## Deployment
-This project is deployed on Hugging Face Spaces using Docker.  
-👉 [Live Demo Here](https://huggingface.co/spaces/Satyam-Vishwakarma/Traffic-Signal-RL)
