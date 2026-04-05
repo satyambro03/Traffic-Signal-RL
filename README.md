@@ -32,13 +32,19 @@ The agent learns to optimize tasks such as email sorting and traffic signal cont
 - **Observation Space**: Cars per lane + traffic density  
 - **Reward**: 1.0 for smooth flow during rush hour, partial reward for improvement  
 
+## Reward System
+- **EmailSort** → Reward = 1.0 if email sorted correctly, else 0.0  
+- **TrafficSignal** → Reward = 1.0 if chosen signal reduces queue length, else 0.0  
+- **MultiIntersection** → Reward = 1.0 for optimal flow, partial rewards (0.2–0.5) for improvements, else 0.0  
+
 ## Files
 - `env.py` → Environment definitions (EmailSortEnv, TrafficSignalEnv, MultiIntersectionEnv)  
 - `openenv.yaml` → Task specifications for all 3 tasks  
 - `inference.py` → Baseline agent (random actions, reproducible scores)  
-- `Dockerfile` → Deployment setup (Gymnasium + NumPy + PyYAML)  
+- `Dockerfile` → Deployment setup (Gymnasium + NumPy + PyYAML + Gradio)  
+- `README.md` → Documentation and hackathon notes  
 
 ## Setup
 ```bash
-pip install gymnasium numpy pyyaml
+pip install gymnasium numpy pyyaml gradio
 python inference.py
