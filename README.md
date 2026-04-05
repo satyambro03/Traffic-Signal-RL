@@ -1,20 +1,42 @@
-# Traffic Signal RL Environment
+---
+title: Traffic Signal RL
+emoji: 🚦
+colorFrom: red
+colorTo: green
+sdk: docker
+sdk_version: "1.0"
+python_version: "3.9"
+app_file: inference.py
+pinned: false
+---
 
-## Description
-This environment simulates traffic signal control to reduce jams.
+# Traffic Signal RL Environment 🚦
+
+## Overview
+This repository contains reinforcement learning environments designed for the hackathon.  
+The agent learns to optimize tasks such as email sorting and traffic signal control.
 
 ## Tasks
-- Task 1: Single intersection control
-- Task 2: Two intersections optimization
-- Task 3: Dynamic traffic flow (rush hour)
+1. **Email Sorting (Easy)**  
+   - Action Space: Discrete(3) → [Work, Personal, Spam]  
+   - Observation Space: 10-dimensional vector  
+   - Reward: 1.0 for correct classification, 0.0 otherwise  
 
-## Action Space
-- 0: Red
-- 1: Green
-- 2: Orange
+2. **Traffic Signal Control (Medium)**  
+   - Action Space: Discrete(3) → [Red, Green, Orange]  
+   - Observation Space: Queue length of cars at a single intersection  
+   - Reward: Positive for reduced waiting time, 0.0 if jam persists  
 
-## Observation Space
-- Queue length of cars at intersection
+3. **Multi-Intersection Optimization (Hard)**  
+   - Action Space: Control multiple signals simultaneously  
+   - Observation Space: Cars per lane + time of day  
+   - Reward: 1.0 for smooth flow during rush hour, partial reward for improvement  
+
+## Files
+- `env.py` → Environment definitions  
+- `openenv.yaml` → Task specifications  
+- `inference.py` → Baseline agent (random actions)  
+- `Dockerfile` → Deployment setup  
 
 ## Setup
 ```bash
