@@ -17,28 +17,28 @@ This repository contains reinforcement learning environments designed for the ha
 The agent learns to optimize tasks such as email sorting and traffic signal control.
 
 ## Tasks
-1. **Email Sorting (Easy)**  
-   - Action Space: Discrete(3) → [Work, Personal, Spam]  
-   - Observation Space: 10-dimensional vector  
-   - Reward: 1.0 for correct classification, 0.0 otherwise  
+### 1. Email Sorting (Easy)
+- **Action Space**: Discrete(3) → [Work, Personal, Spam]  
+- **Observation Space**: 10-dimensional vector  
+- **Reward**: 1.0 for correct classification, 0.0 otherwise  
 
-2. **Traffic Signal Control (Medium)**  
-   - Action Space: Discrete(3) → [Red, Green, Orange]  
-   - Observation Space: Queue length of cars at a single intersection  
-   - Reward: Positive for reduced waiting time, 0.0 if jam persists  
+### 2. Traffic Signal Control (Medium)
+- **Action Space**: Discrete(3) → [Red, Green, Orange]  
+- **Observation Space**: Queue length of cars at a single intersection  
+- **Reward**: Positive for reduced waiting time, 0.0 if jam persists  
 
-3. **Multi-Intersection Optimization (Hard)**  
-   - Action Space: Control multiple signals simultaneously  
-   - Observation Space: Cars per lane + time of day  
-   - Reward: 1.0 for smooth flow during rush hour, partial reward for improvement  
+### 3. Multi-Intersection Optimization (Hard)
+- **Action Space**: Discrete(6) → control multiple signals simultaneously  
+- **Observation Space**: Cars per lane + time of day  
+- **Reward**: 1.0 for smooth flow during rush hour, partial reward for improvement  
 
 ## Files
-- `env.py` → Environment definitions  
-- `openenv.yaml` → Task specifications  
+- `env.py` → Environment definitions (EmailSortEnv, TrafficSignalEnv, MultiIntersectionEnv)  
+- `openenv.yaml` → Task specifications for all 3 tasks  
 - `inference.py` → Baseline agent (random actions)  
 - `Dockerfile` → Deployment setup  
 
 ## Setup
 ```bash
-pip install torch gym numpy pyyaml
+pip install torch gymnasium numpy pyyaml
 python inference.py
