@@ -1,12 +1,39 @@
+tasks:
+  - name: EmailSort
+    action_space:
+      type: Discrete
+      size: 3
+      description: Work, Personal, Spam
+    observation_space:
+      type: Box
+      shape: [10]
+      low: 0
+      high: 1
+      dtype: float32
+    task_description: Agent sorts emails into categories.
 
-action_space:
-  type: Discrete
-  size: 3
-  description: Work, Personal, Spam
-observation_space:
-  type: Box
-  shape: [10]
-  low: 0
-  high: 1
-  dtype: float32
-task_description: The agent needs to sort emails into 'Work', 'Personal', or 'Spam' categories based on a 10-dimensional observation. The reward is 1.0 for a correct classification and 0.0 for incorrect (or partial reward for advanced step function).
+  - name: TrafficSignal
+    action_space:
+      type: Discrete
+      size: 3
+      description: Red, Green, Orange
+    observation_space:
+      type: Box
+      shape: [4]
+      low: 0
+      high: 20
+      dtype: int
+    task_description: Agent controls a single traffic signal to reduce jams.
+
+  - name: MultiIntersection
+    action_space:
+      type: Discrete
+      size: 6
+      description: Control multiple signals simultaneously
+    observation_space:
+      type: Box
+      shape: [8]
+      low: 0
+      high: 50
+      dtype: int
+    task_description: Agent optimizes multiple intersections during rush hour.

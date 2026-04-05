@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN pip install torch gym numpy pyyaml
+RUN pip install torch gymnasium numpy pyyaml
 
 # Command to run inference
 CMD ["python", "inference.py"]
