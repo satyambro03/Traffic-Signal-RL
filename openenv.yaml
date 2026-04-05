@@ -10,7 +10,7 @@ tasks:
       low: 0
       high: 1
       dtype: float32
-    task_description: The agent needs to sort emails into 'Work', 'Personal', or 'Spam' categories based on a 10-dimensional observation. Reward is 1.0 for correct classification and 0.0 otherwise.
+    task_description: Agent sorts emails into categories.
 
   - name: TrafficSignal
     action_space:
@@ -23,7 +23,7 @@ tasks:
       low: 0
       high: 20
       dtype: int
-    task_description: The agent controls a single traffic signal to reduce jams. Reward is positive if queue length decreases, 0.0 if jam persists.
+    task_description: Agent controls a single traffic signal to reduce jams.
 
   - name: MultiIntersection
     action_space:
@@ -36,4 +36,4 @@ tasks:
       low: 0
       high: 50
       dtype: int
-    task_description: The agent optimizes multiple intersections during rush hour. Reward is 1.0 for smooth flow, partial reward for improvement, 0.0 if congestion increases.
+    task_description: Agent optimizes multiple intersections during rush hour.

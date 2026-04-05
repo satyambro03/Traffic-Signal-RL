@@ -13,8 +13,8 @@ pinned: false
 # Traffic Signal RL Environment 🚦
 
 ## Overview
-This repository contains reinforcement learning environments designed for the hackathon.  
-The agent learns to optimize tasks such as email sorting and traffic signal control.
+This repository contains reinforcement learning environments designed for the Meta PyTorch OpenEnv Hackathon.  
+The agent learns to optimize tasks such as email sorting and traffic signal control using the standard `step()` / `reset()` API.
 
 ## Tasks
 ### 1. Email Sorting (Easy)
@@ -29,16 +29,16 @@ The agent learns to optimize tasks such as email sorting and traffic signal cont
 
 ### 3. Multi-Intersection Optimization (Hard)
 - **Action Space**: Discrete(6) → control multiple signals simultaneously  
-- **Observation Space**: Cars per lane + time of day  
+- **Observation Space**: Cars per lane + traffic density  
 - **Reward**: 1.0 for smooth flow during rush hour, partial reward for improvement  
 
 ## Files
 - `env.py` → Environment definitions (EmailSortEnv, TrafficSignalEnv, MultiIntersectionEnv)  
 - `openenv.yaml` → Task specifications for all 3 tasks  
-- `inference.py` → Baseline agent (random actions)  
-- `Dockerfile` → Deployment setup  
+- `inference.py` → Baseline agent (random actions, reproducible scores)  
+- `Dockerfile` → Deployment setup (Gymnasium + NumPy + PyYAML)  
 
 ## Setup
 ```bash
-pip install torch gymnasium numpy pyyaml
+pip install gymnasium numpy pyyaml
 python inference.py
