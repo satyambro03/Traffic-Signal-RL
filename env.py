@@ -1,51 +1,66 @@
 import gymnasium as gym
-from gymnasium import spaces
 import numpy as np
 
-# Easy Task: Email Sorting
+# 1. Email Sorting Environment
 class EmailSortEnv(gym.Env):
     def __init__(self):
-        super(EmailSortEnv, self).__init__()
-        self.action_space = spaces.Discrete(3)  # Work, Personal, Spam
-        self.observation_space = spaces.Box(low=0, high=1, shape=(10,), dtype=np.float32)
+        super().__init__()
+        self.action_space = gym.spaces.Discrete(3)  # Work, Personal, Spam
+        self.observation_space = gym.spaces.Box(low=0, high=1, shape=(10,), dtype=np.float32)
 
-    def reset(self, seed=None, options=None):
-        self.state = np.random.rand(10)
-        return self.state, {}
+    def reset(self, *, seed=None, options=None):
+        super().reset(seed=seed)
+        state = np.random.rand(10).astype(np.float32)
+        info = {}  # must return info dict
+        return state, info
 
     def step(self, action):
-        reward = 1.0 if action == np.argmax(self.state) else 0.0
+        reward = 1.0 if action == np.random.randint(0, 3) else 0.0
         done = True
-        return self.state, reward, done, False, {}
+        truncated = False
+        info = {}
+        return np.random.rand(10).astype(np.float32), reward, done, truncated, info
 
-# Medium Task: Single Traffic Signal
+
+# 2. Traffic Signal Environment
 class TrafficSignalEnv(gym.Env):
     def __init__(self):
-        super(TrafficSignalEnv, self).__init__()
-        self.action_space = spaces.Discrete(3)  # Red, Green, Orange
-        self.observation_space = spaces.Box(low=0, high=20, shape=(4,), dtype=np.int32)
+        super().__init__()
+        self.action_space = gym.spaces.Discrete(3)  # Red, Green, Orange
+        self.observation_space = gym.spaces.Box(low=0, high=20, shape=(1,), dtype=np.int32)
 
-    def reset(self, seed=None, options=None):
-        self.state = np.random.randint(0, 20, size=(4,))
-        return self.state, {}
+    def reset(self, *, seed=None, options=None):
+        super().reset(seed=seed)
+        state = np.array([np.random.randint(0, 20)], dtype=np.int32)
+        info = {}
+        return state, info
 
     def step(self, action):
-        reward = 1.0 if action == np.argmin(self.state) else 0.0
+        queue_length = np.random.randint(0, 20)
+        reward = 1.0 if queue_length < 10 else 0.0
         done = True
-        return self.state, reward, done, False, {}
+        truncated = False
+        info = {}
+        return np.array([queue_length], dtype=np.int32), reward, done, truncated, info
 
-# Hard Task: Multi-Intersection Optimization
+
+# 3. Multi-Intersection Environment
 class MultiIntersectionEnv(gym.Env):
     def __init__(self):
-        super(MultiIntersectionEnv, self).__init__()
-        self.action_space = spaces.Discrete(6)  # multiple signals
-        self.observation_space = spaces.Box(low=0, high=50, shape=(8,), dtype=np.int32)
+        super().__init__()
+        self.action_space = gym.spaces.Discrete(6)  # multiple signals
+        self.observation_space = gym.spaces.Box(low=0, high=50, shape=(4,), dtype=np.int32)
 
-    def reset(self, seed=None, options=None):
-        self.state = np.random.randint(0, 50, size=(8,))
-        return self.state, {}
+    def reset(self, *, seed=None, options=None):
+        super().reset(seed=seed)
+        state = np.random.randint(0, 50, size=(4,), dtype=np.int32)
+        info = {}
+        return state, info
 
     def step(self, action):
-        reward = 1.0 if action == np.argmin(self.state) else 0.0
+        cars = np.random.randint(0, 50, size=(4,), dtype=np.int32)
+        reward = 1.0 if np.mean(cars) < 25 else 0.5 if np.mean(cars) < 40 else 0.0
         done = True
-        return self.state, reward, done, False, {}
+        truncated = False
+        info = {}
+        return cars, reward, done, truncated, info
