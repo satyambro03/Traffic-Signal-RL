@@ -14,22 +14,36 @@ pinned: false
 
 ![Traffic Signal RL Demo Screenshot](Preview.png)
 
-## 📌 Overview
-This repository contains reinforcement learning environments designed for the **Meta PyTorch OpenEnv Hackathon**.  
-The agent learns to optimize tasks such as **email sorting** and **traffic signal control** using the standard `step()` / `reset()` API.
+## 📌 Description
+Traffic Signal RL is a reinforcement learning environment built for the **Meta PyTorch OpenEnv Hackathon**.  
+It demonstrates how agents can optimize **email sorting**, **traffic signal control**, and **multi‑intersection management** using the OpenEnv specification (`reset()`, `step()`, `state()`).
 
 ---
 
-## 🎥 Demo Videos & Links
-- [Demo Video 1](https://youtu.be/yLOCH5eh9n4?si=Te7T9KNouB3stD0i)  
-- [Demo Video 2](https://youtu.be/0GhofuoE1uQ?si=b4KPoj2GzCxZLCRr)  
-- Hugging Face Deploy Link 👉 [Traffic-Signal-RL Space](https://huggingface.co/spaces/Satyam-Vishwakarma/Traffic-Signal-RL)  
+## 🌐 Website
+- Hugging Face Space 👉 [Traffic-Signal-RL Demo](https://huggingface.co/spaces/Satyam-Vishwakarma/Traffic-Signal-RL)  
 - GitHub Repo 👉 [Traffic-Signal-RL Repository](https://github.com/satyambro03/Traffic-Signal-RL)
 
 ---
 
-## 🧩 Tasks
+## 🏷️ Topics
+- Reinforcement Learning  
+- OpenEnv Hackathon  
+- Hugging Face Spaces  
+- PyTorch  
+- Traffic Optimization  
+- Email Classification  
+- Multi-Intersection Control  
 
+---
+
+## 🎥 Demo Videos
+- [Demo Video 1](https://youtu.be/yLOCH5eh9n4?si=Te7T9KNouB3stD0i)  
+- [Demo Video 2](https://youtu.be/0GhofuoE1uQ?si=b4KPoj2GzCxZLCRr)
+
+---
+
+## 🧩 Tasks
 ### 1. Email Sorting (Easy)
 - **Action Space**: Discrete(3) → [Work, Personal, Spam]  
 - **Observation Space**: 10-dimensional vector  
@@ -44,13 +58,6 @@ The agent learns to optimize tasks such as **email sorting** and **traffic signa
 - **Action Space**: Discrete(6) → control multiple signals simultaneously  
 - **Observation Space**: Cars per lane + traffic density  
 - **Reward**: 1.0 for smooth flow during rush hour, partial reward for improvement  
-
----
-
-## 🎯 Reward System
-- **EmailSort** → Reward = 1.0 if email sorted correctly, else 0.0  
-- **TrafficSignal** → Reward = 1.0 if chosen signal reduces queue length, else 0.0  
-- **MultiIntersection** → Reward = 1.0 for optimal flow, partial rewards (0.2–0.5) for improvements, else 0.0  
 
 ---
 
