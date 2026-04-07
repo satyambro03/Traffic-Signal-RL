@@ -61,6 +61,13 @@ It demonstrates how agents can optimize **email sorting**, **traffic signal cont
 
 ---
 
+## 🎯 Reward System
+- **EmailSort** → Reward = 1.0 if email sorted correctly, else 0.0  
+- **TrafficSignal** → Reward = 1.0 if chosen signal reduces queue length, else 0.0  
+- **MultiIntersection** → Reward = 1.0 for optimal flow, partial rewards (0.2–0.5) for improvements, else 0.0 
+
+---
+
 ## 📂 Files
 - `env.py` → Environment definitions (EmailSortEnv, TrafficSignalEnv, MultiIntersectionEnv)  
 - `openenv.yaml` → Task specifications for all 3 tasks  
