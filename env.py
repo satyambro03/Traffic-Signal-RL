@@ -10,8 +10,8 @@ class EmailSortEnv(gym.Env):
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
-        state = np.random.rand(10).astype(np.float32)
-        info = {}  # must return info dict
+        state = self.observation_space.sample()  # always valid
+        info = {}
         return state, info
 
     def step(self, action):
@@ -19,7 +19,8 @@ class EmailSortEnv(gym.Env):
         done = True
         truncated = False
         info = {}
-        return np.random.rand(10).astype(np.float32), reward, done, truncated, info
+        next_state = self.observation_space.sample()
+        return next_state, reward, done, truncated, info
 
 
 # 2. Traffic Signal Environment
@@ -31,17 +32,17 @@ class TrafficSignalEnv(gym.Env):
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
-        state = np.array([np.random.randint(0, 20)], dtype=np.int32)
+        state = self.observation_space.sample()
         info = {}
         return state, info
 
     def step(self, action):
-        queue_length = np.random.randint(0, 20)
-        reward = 1.0 if queue_length < 10 else 0.0
+        reward = 1.0 if np.random.randint(0, 20) < 10 else 0.0
         done = True
         truncated = False
         info = {}
-        return np.array([queue_length], dtype=np.int32), reward, done, truncated, info
+        next_state = self.observation_space.sample()
+        return next_state, reward, done, truncated, info
 
 
 # 3. Multi-Intersection Environment
@@ -53,13 +54,14 @@ class MultiIntersectionEnv(gym.Env):
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
-        state = np.random.randint(0, 50, size=(4,), dtype=np.int32)
+        state = self.observation_space.sample()
         info = {}
         return state, info
 
     def step(self, action):
-        cars = np.random.randint(0, 50, size=(4,), dtype=np.int32)
-        reward = 1.0 if np.mean(cars) < 25 else 0.5 if np.mean(cars) < 40 else 0.0
+        cars = self.observation_space.sample()
+        avg_density = np.mean(cars)
+        reward = 1.0 if avg_density < 25 else 0.5 if avg_density < 40 else 0.0
         done = True
         truncated = False
         info = {}
