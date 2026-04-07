@@ -47,4 +47,4 @@ def run_task(task_name="TrafficSignal"):
 
 if __name__ == "__main__":
     run_task("TrafficSignal")
-    
+
