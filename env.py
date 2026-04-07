@@ -5,8 +5,7 @@ import numpy as np
 class EmailSortEnv(gym.Env):
     def __init__(self):
         super().__init__()
-        # 3 categories: Work, Personal, Spam
-        self.action_space = gym.spaces.Discrete(3)
+        self.action_space = gym.spaces.Discrete(3)  # Work, Personal, Spam
         self.observation_space = gym.spaces.Box(low=0, high=1, shape=(10,), dtype=np.float32)
 
     def reset(self, *, seed=None, options=None):
@@ -28,19 +27,17 @@ class EmailSortEnv(gym.Env):
 class TrafficSignalEnv(gym.Env):
     def __init__(self):
         super().__init__()
-        # 3 actions: Red, Green, Orange
-        self.action_space = gym.spaces.Discrete(3)
+        self.action_space = gym.spaces.Discrete(3)  # Red, Green, Orange
         self.observation_space = gym.spaces.Box(low=0, high=20, shape=(1,), dtype=np.int32)
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
-        state = self.observation_space.sample()  # always valid
+        state = self.observation_space.sample()
         info = {}
         return state, info
 
     def step(self, action):
-        queue_length = np.random.randint(0, 20)
-        reward = 1.0 if queue_length < 10 else 0.0
+        reward = 1.0 if np.random.randint(0, 20) < 10 else 0.0
         done = True
         truncated = False
         info = {}
@@ -52,25 +49,19 @@ class TrafficSignalEnv(gym.Env):
 class MultiIntersectionEnv(gym.Env):
     def __init__(self):
         super().__init__()
-        # 6 actions: controlling multiple signals
-        self.action_space = gym.spaces.Discrete(6)
+        self.action_space = gym.spaces.Discrete(6)  # multiple signals
         self.observation_space = gym.spaces.Box(low=0, high=50, shape=(4,), dtype=np.int32)
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
-        state = self.observation_space.sample()  # always valid
+        state = self.observation_space.sample()
         info = {}
         return state, info
 
     def step(self, action):
         cars = self.observation_space.sample()
         avg_density = np.mean(cars)
-        if avg_density < 25:
-            reward = 1.0
-        elif avg_density < 40:
-            reward = 0.5
-        else:
-            reward = 0.0
+        reward = 1.0 if avg_density < 25 else 0.5 if avg_density < 40 else 0.0
         done = True
         truncated = False
         info = {}
