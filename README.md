@@ -10,13 +10,26 @@ app_file: inference.py
 pinned: false
 ---
 
-# Traffic Signal RL Environment 🚦
+# 🚦 Traffic Signal RL Environment
 
-## Overview
-This repository contains reinforcement learning environments designed for the Meta PyTorch OpenEnv Hackathon.  
-The agent learns to optimize tasks such as email sorting and traffic signal control using the standard `step()` / `reset()` API.
+![Traffic Signal RL Demo Screenshot](Preview.png)
 
-## Tasks
+## 📌 Overview
+This repository contains reinforcement learning environments designed for the **Meta PyTorch OpenEnv Hackathon**.  
+The agent learns to optimize tasks such as **email sorting** and **traffic signal control** using the standard `step()` / `reset()` API.
+
+---
+
+## 🎥 Demo Videos & Links
+- [Demo Video 1](https://youtu.be/yLOCH5eh9n4?si=Te7T9KNouB3stD0i)  
+- [Demo Video 2](https://youtu.be/0GhofuoE1uQ?si=b4KPoj2GzCxZLCRr)  
+- Hugging Face Deploy Link 👉 [Traffic-Signal-RL Space](https://huggingface.co/spaces/Satyam-Vishwakarma/Traffic-Signal-RL)  
+- GitHub Repo 👉 [Traffic-Signal-RL Repository](https://github.com/satyambro03/Traffic-Signal-RL)
+
+---
+
+## 🧩 Tasks
+
 ### 1. Email Sorting (Easy)
 - **Action Space**: Discrete(3) → [Work, Personal, Spam]  
 - **Observation Space**: 10-dimensional vector  
@@ -32,20 +45,27 @@ The agent learns to optimize tasks such as email sorting and traffic signal cont
 - **Observation Space**: Cars per lane + traffic density  
 - **Reward**: 1.0 for smooth flow during rush hour, partial reward for improvement  
 
-## Reward System
+---
+
+## 🎯 Reward System
 - **EmailSort** → Reward = 1.0 if email sorted correctly, else 0.0  
 - **TrafficSignal** → Reward = 1.0 if chosen signal reduces queue length, else 0.0  
 - **MultiIntersection** → Reward = 1.0 for optimal flow, partial rewards (0.2–0.5) for improvements, else 0.0  
 
-## Files
+---
+
+## 📂 Files
 - `env.py` → Environment definitions (EmailSortEnv, TrafficSignalEnv, MultiIntersectionEnv)  
 - `openenv.yaml` → Task specifications for all 3 tasks  
 - `inference.py` → Baseline agent (random actions, reproducible scores)  
+- `ui_inference.py` → Gradio UI for demo mode  
 - `Dockerfile` → Deployment setup (Gymnasium + NumPy + PyYAML + Gradio)  
 - `README.md` → Documentation and hackathon notes  
-- `.gitattributes` → Optional file for repo consistency (line endings, linguist settings)  
+- `.gitattributes` → Optional file for repo consistency  
 
-## Setup
+---
+
+## ⚙️ Setup
 ```bash
 pip install gymnasium numpy pyyaml gradio
 python inference.py
