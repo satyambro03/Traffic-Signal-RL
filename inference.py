@@ -1,32 +1,49 @@
-import gradio as gr
+import os
 import numpy as np
-from env import EmailSortEnv, TrafficSignalEnv, MultiIntersectionEnv
+from env import TrafficSignalEnv, EmailSortEnv, MultiIntersectionEnv
 
-def run_task(task_name):
+API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
+MODEL_NAME = os.getenv("MODEL_NAME", "baseline-model")
+HF_TOKEN = os.getenv("HF_TOKEN")
+
+def run_task(task_name="TrafficSignal"):
     env_map = {
-        "EmailSort": EmailSortEnv,
         "TrafficSignal": TrafficSignalEnv,
+        "EmailSort": EmailSortEnv,
         "MultiIntersection": MultiIntersectionEnv
     }
     env_class = env_map[task_name]
     env = env_class()
-    scores = []
-    for _ in range(10):
+
+    rewards = []
+    steps = 0
+    success = False
+
+    print(f"[START] task={task_name} env={task_name.lower()} model={MODEL_NAME}", flush=True)
+
+    try:
         state, _ = env.reset()
         done = False
+
         while not done:
             action = env.action_space.sample()
-            state, reward, done, truncated, info = env.step(action)
-            scores.append(reward)
-    return f"{task_name} Average score: {np.mean(scores):.2f}"
+            next_state, reward, done, truncated, info = env.step(action)
+            steps += 1
+            rewards.append(reward)
 
-demo = gr.Interface(
-    fn=run_task,
-    inputs=gr.Dropdown(["EmailSort", "TrafficSignal", "MultiIntersection"], label="Choose Task"),
-    outputs="text",
-    title="Traffic Signal RL Demo",
-    description="Select a task to run baseline agent and see average score."
-)
+            print(f"[STEP] step={steps} action={action} reward={reward:.2f} done={str(done).lower()} error=null", flush=True)
+            state = next_state
+
+        score = min(max(np.mean(rewards), 0.0), 1.0)
+        success = score >= 0.1
+
+    finally:
+        env.close()
+        rewards_str = ",".join(f"{r:.2f}" for r in rewards)
+        print(f"[END] success={str(success).lower()} steps={steps} score={score:.2f} rewards={rewards_str}", flush=True)
+
+    # ✅ Return summary string for UI
+    return f"Task={task_name}, Steps={steps}, Score={score:.2f}, Success={success}, Rewards={rewards_str}"
 
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=7860)
+    run_task("TrafficSignal")
