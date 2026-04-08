@@ -66,4 +66,3 @@ class MultiIntersectionEnv(gym.Env):
         truncated = False
         info = {}
         return cars, reward, done, truncated, info
-    
