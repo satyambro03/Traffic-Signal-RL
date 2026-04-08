@@ -11,4 +11,4 @@ CMD ["python", "inference.py"]
 
 # For demo mode (Gradio UI)
 # CMD ["python", "ui_inference.py"]
-# CMD ["python", "ui_inference.py"]
+CMD ["python", "ui_inference.py"]
