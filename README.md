@@ -83,8 +83,3 @@ It demonstrates how agents can optimize **email sorting**, **traffic signal cont
 ```bash
 pip install gymnasium numpy pyyaml gradio
 python inference.py
-<<<<<<< HEAD
-
-# "Full RL Complete"
-=======
->>>>>>> 681b396dc3ccc7c72d61e1a96379956475dbe384
