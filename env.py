@@ -23,6 +23,7 @@ class EmailSortEnv(gym.Env):
         next_state = self.observation_space.sample()
         return next_state, reward, done, truncated, info
 
+
 # 2. Traffic Signal Environment
 class TrafficSignalEnv(gym.Env):
     def __init__(self):

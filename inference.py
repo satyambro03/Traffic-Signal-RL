@@ -1,7 +1,5 @@
 import os
-import sys
 import numpy as np
-import traceback
 from fastapi import FastAPI, Request
 import uvicorn
 from openai import OpenAI
@@ -33,10 +31,11 @@ env_map = {
 async def reset_endpoint(request: Request):
     """
     Hugging Face validator calls POST /reset.
-    Body: {"task_id": "TrafficSignal"} or similar.
+    Body: {"task_id": "TrafficSignal"} or {"task": "TrafficSignal"}.
     """
     data = await request.json()
-    task_id = data.get("task_id", "TrafficSignal")
+    task_id = data.get("task_id") or data.get("task") or "TrafficSignal"
+
     if task_id not in env_map:
         return {"error": f"Unknown task_id {task_id}"}
 
