@@ -30,7 +30,8 @@ class TrafficSignalEnv(gym.Env):
         super().__init__()
         # 3 actions: Red, Green, Orange
         self.action_space = gym.spaces.Discrete(3)
-        self.observation_space = gym.spaces.Box(low=0, high=20, shape=(1,), dtype=np.int32)
+        # ✅ Match YAML: shape (4,), dtype=int
+        self.observation_space = gym.spaces.Box(low=0, high=20, shape=(4,), dtype=np.int32)
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
@@ -54,7 +55,8 @@ class MultiIntersectionEnv(gym.Env):
         super().__init__()
         # 6 actions: controlling multiple signals
         self.action_space = gym.spaces.Discrete(6)
-        self.observation_space = gym.spaces.Box(low=0, high=50, shape=(4,), dtype=np.int32)
+        # ✅ Match YAML: shape (8,), dtype=int
+        self.observation_space = gym.spaces.Box(low=0, high=50, shape=(8,), dtype=np.int32)
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
