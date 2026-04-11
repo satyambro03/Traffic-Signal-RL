@@ -59,12 +59,15 @@ async def reset_endpoint(request: Request):
 def run_task(task_name="TrafficSignal"):
     env_class = env_map.get(task_name)
     if env_class is None:
+        print(f"[START] task={task_name} error=Unknown task", flush=True)
+        print(f"[END] success=false steps=0 rewards=", flush=True)
         return {"task": task_name, "steps": 0, "success": False, "error": "Unknown task"}
 
     rewards = []
     steps = 0
     success = False
 
+    # START block
     print(f"[START] task={task_name} env={task_name.lower()} model={MODEL_NAME}", flush=True)
 
     try:
@@ -78,6 +81,7 @@ def run_task(task_name="TrafficSignal"):
                 done = True
             steps += 1
             rewards.append(float(reward))
+            # STEP block
             print(f"[STEP] step={steps} action={action} reward={reward:.2f} done={str(done).lower()} error=null", flush=True)
             state = next_state
         score = float(np.mean(rewards)) if rewards else 0.0
@@ -90,6 +94,7 @@ def run_task(task_name="TrafficSignal"):
         except:
             pass
         rewards_str = ",".join(f"{r:.2f}" for r in rewards)
+        # END block
         print(f"[END] success={str(success).lower()} steps={steps} rewards={rewards_str}", flush=True)
 
     return {"task": task_name, "steps": steps, "success": success}
