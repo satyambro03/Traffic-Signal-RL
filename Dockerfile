@@ -6,13 +6,10 @@ COPY . .
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-# RUN pip install --no-cache-dir --upgrade pip \
-#     && pip install --no-cache-dir gymnasium numpy pyyaml gradio openai huggingface_hub==0.23.0
-    
-
 EXPOSE 7860
+
 # For hackathon submission (STDOUT logs)
-CMD ["python", "inference.py"]
+CMD ["python", "-m", "server.app"]
 
 # For demo mode (Gradio UI)
 # CMD ["python", "ui_inference.py"]
