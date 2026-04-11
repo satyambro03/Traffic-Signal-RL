@@ -99,6 +99,12 @@ def run_task(task_name="TrafficSignal"):
 
     return {"task": task_name, "steps": steps, "success": success}
 
-# ✅ Important: call run_task once at startup so validator sees logs
+# ✅ Startup: run all three tasks once, then keep server alive
 if __name__ == "__main__":
     run_task("TrafficSignal")
+    run_task("EmailSort")
+    run_task("MultiIntersection")
+
+    # Keep FastAPI server running so Space stays healthy
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=7860)
