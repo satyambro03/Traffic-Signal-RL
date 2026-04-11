@@ -10,7 +10,7 @@ API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
 HF_TOKEN = os.getenv("HF_TOKEN")
 
-# Safe OpenAI client init (optional, not critical for validator)
+# Safe OpenAI client init (optional)
 try:
     if HF_TOKEN:
         from openai import OpenAI
@@ -25,7 +25,6 @@ except Exception as e:
 # FastAPI app
 app = FastAPI()
 
-# Root route
 @app.get("/")
 async def root():
     return {"status": "running", "message": "FastAPI server is live. Use POST /reset."}
@@ -39,10 +38,6 @@ env_map = {
 
 @app.post("/reset")
 async def reset_endpoint(request: Request):
-    """
-    Hugging Face validator calls POST /reset.
-    Body may be empty, or contain {"task_id": "..."} or {"task": "..."}.
-    """
     try:
         data = await request.json()
     except Exception:
