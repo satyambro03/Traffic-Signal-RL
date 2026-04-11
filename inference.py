@@ -20,6 +20,11 @@ client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
 # FastAPI app
 app = FastAPI()
 
+# Root route (to avoid 404 on GET /)
+@app.get("/")
+async def root():
+    return {"status": "running", "message": "FastAPI server is live. Use POST /reset."}
+
 # Map tasks to envs
 env_map = {
     "TrafficSignal": TrafficSignalEnv,
@@ -31,9 +36,13 @@ env_map = {
 async def reset_endpoint(request: Request):
     """
     Hugging Face validator calls POST /reset.
-    Body: {"task_id": "TrafficSignal"} or {"task": "TrafficSignal"}.
+    Body may be empty, or contain {"task_id": "..."} or {"task": "..."}.
     """
-    data = await request.json()
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+
     task_id = data.get("task_id") or data.get("task") or "TrafficSignal"
 
     if task_id not in env_map:
