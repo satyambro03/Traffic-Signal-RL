@@ -1,0 +1,22 @@
+[project]
+name = "traffic-signal-rl"
+version = "0.1.0"
+description = "Reinforcement Learning environments for OpenEnv Hackathon"
+authors = [{ name = "Satyam Vishwakarma" }]
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "openai",
+    "gymnasium",
+    "numpy",
+    "pyyaml",
+    "gradio",
+    "huggingface_hub==0.23.0",
+    "openenv"
+]
+
+[tool.setuptools]
+py-modules = []
