@@ -8,13 +8,9 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 EXPOSE 7860
 
-# For hackathon submission (STDOUT logs)
-# CMD ["python", "-m", "server.app"]
-
 # For hackathon submission (structured logs to stdout)
 CMD ["python", "inference.py"]
 
-
-
-# For demo mode (Gradio UI)
+# For demo mode (Gradio UI) - commented out
 # CMD ["python", "ui_inference.py"]
+# CMD ["python", "-m", "server.app"]
