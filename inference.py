@@ -105,6 +105,7 @@ if __name__ == "__main__":
     run_task("EmailSort")
     run_task("MultiIntersection")
 
+
     # Keep FastAPI server running so Space stays healthy
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=7860)
