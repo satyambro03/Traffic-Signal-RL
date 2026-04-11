@@ -98,3 +98,7 @@ def run_task(task_name="TrafficSignal"):
         print(f"[END] success={str(success).lower()} steps={steps} rewards={rewards_str}", flush=True)
 
     return {"task": task_name, "steps": steps, "success": success}
+
+# ✅ Important: call run_task once at startup so validator sees logs
+if __name__ == "__main__":
+    run_task("TrafficSignal")
