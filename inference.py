@@ -1,7 +1,6 @@
 import os
 import numpy as np
 from fastapi import FastAPI, Request
-import uvicorn
 
 # Import your environments
 from env import TrafficSignalEnv, EmailSortEnv, MultiIntersectionEnv
@@ -99,9 +98,3 @@ def run_task(task_name="TrafficSignal"):
         print(f"[END] success={str(success).lower()} steps={steps} rewards={rewards_str}", flush=True)
 
     return {"task": task_name, "steps": steps, "success": success}
-
-if __name__ == "__main__":
-    try:
-        uvicorn.run(app, host="0.0.0.0", port=7860)
-    except Exception as e:
-        print(f"[ERROR] Uvicorn failed: {e}", flush=True)
