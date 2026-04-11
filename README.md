@@ -64,7 +64,7 @@ It demonstrates how agents can optimize **email sorting**, **traffic signal cont
 ## 🎯 Reward System
 - **EmailSort** → Reward = 1.0 if email sorted correctly, else 0.0  
 - **TrafficSignal** → Reward = 1.0 if chosen signal reduces queue length, else 0.0  
-- **MultiIntersection** → Reward = 1.0 for optimal flow, partial rewards (0.2–0.5) for improvements, else 0.0 
+- **MultiIntersection** → Reward = 1.0 for optimal flow, partial rewards (0.2–0.5) for improvements, else 0.0  
 
 ---
 
@@ -75,11 +75,12 @@ It demonstrates how agents can optimize **email sorting**, **traffic signal cont
 - `ui_inference.py` → Gradio UI for demo mode  
 - `Dockerfile` → Deployment setup (Gymnasium + NumPy + PyYAML + Gradio)  
 - `README.md` → Documentation and hackathon notes  
+- `pyproject.toml` → Project metadata and dependencies for OpenEnv validator  
 - `.gitattributes` → Optional file for repo consistency  
 
 ---
 
 ## ⚙️ Setup
 ```bash
-pip install gymnasium numpy pyyaml gradio
+pip install gymnasium numpy pyyaml gradio fastapi uvicorn openai huggingface_hub==0.23.0 openenv
 python inference.py
