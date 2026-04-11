@@ -2,7 +2,6 @@ import os
 import numpy as np
 from fastapi import FastAPI, Request
 import uvicorn
-from openai import OpenAI
 
 # Import your environments
 from env import TrafficSignalEnv, EmailSortEnv, MultiIntersectionEnv
@@ -12,15 +11,22 @@ API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
 HF_TOKEN = os.getenv("HF_TOKEN")
 
-if HF_TOKEN is None:
-    raise ValueError("HF_TOKEN environment variable is required")
-
-client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
+# Safe OpenAI client init (optional, not critical for validator)
+try:
+    if HF_TOKEN:
+        from openai import OpenAI
+        client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
+    else:
+        print("[WARN] HF_TOKEN not set, skipping OpenAI client init", flush=True)
+        client = None
+except Exception as e:
+    print(f"[ERROR] OpenAI client init failed: {e}", flush=True)
+    client = None
 
 # FastAPI app
 app = FastAPI()
 
-# Root route (to avoid 404 on GET /)
+# Root route
 @app.get("/")
 async def root():
     return {"status": "running", "message": "FastAPI server is live. Use POST /reset."}
@@ -46,16 +52,21 @@ async def reset_endpoint(request: Request):
     task_id = data.get("task_id") or data.get("task") or "TrafficSignal"
 
     if task_id not in env_map:
-        return {"error": f"Unknown task_id {task_id}"}
+        return {"status": "error", "task": task_id, "message": f"Unknown task_id {task_id}"}
 
-    env = env_map[task_id]()
-    state, _ = env.reset()
-    env.close()
-    return {"status": "ok", "task": task_id, "state": state.tolist()}
+    try:
+        env = env_map[task_id]()
+        state, _ = env.reset()
+        env.close()
+        return {"status": "ok", "task": task_id, "state": state.tolist()}
+    except Exception as e:
+        return {"status": "error", "task": task_id, "message": str(e)}
 
 def run_task(task_name="TrafficSignal"):
-    env_class = env_map[task_name]
-    env = env_class()
+    env_class = env_map.get(task_name)
+    if env_class is None:
+        return {"task": task_name, "steps": 0, "success": False, "error": "Unknown task"}
+
     rewards = []
     steps = 0
     success = False
@@ -63,6 +74,7 @@ def run_task(task_name="TrafficSignal"):
     print(f"[START] task={task_name} env={task_name.lower()} model={MODEL_NAME}", flush=True)
 
     try:
+        env = env_class()
         state, _ = env.reset()
         done = False
         while not done:
@@ -76,13 +88,20 @@ def run_task(task_name="TrafficSignal"):
             state = next_state
         score = float(np.mean(rewards)) if rewards else 0.0
         success = score >= 0.1
+    except Exception as e:
+        print(f"[ERROR] run_task failed: {e}", flush=True)
     finally:
-        env.close()
+        try:
+            env.close()
+        except:
+            pass
         rewards_str = ",".join(f"{r:.2f}" for r in rewards)
         print(f"[END] success={str(success).lower()} steps={steps} rewards={rewards_str}", flush=True)
 
     return {"task": task_name, "steps": steps, "success": success}
 
 if __name__ == "__main__":
-    # Run FastAPI server so HF Space exposes /reset
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+    try:
+        uvicorn.run(app, host="0.0.0.0", port=7860)
+    except Exception as e:
+        print(f"[ERROR] Uvicorn failed: {e}", flush=True)
