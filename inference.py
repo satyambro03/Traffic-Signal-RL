@@ -135,3 +135,26 @@ async def startup_event():
 @app.get("/")
 async def root():
     return {"status": "running"}
+
+
+@app.post("/reset")
+async def reset_endpoint(request: Request):
+    try:
+        data = await request.json()
+    except:
+        data = {}
+
+    task = data.get("task", "TrafficSignal")
+
+    if task not in env_map:
+        return {"status": "error", "message": "Invalid task"}
+
+    env = env_map[task]()
+    state, _ = env.reset()
+    env.close()
+
+    return {
+        "status": "ok",
+        "task": task,
+        "state": state.tolist()
+    }
