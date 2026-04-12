@@ -1,31 +1,26 @@
 import os
 import numpy as np
 from fastapi import FastAPI, Request
+from openai import OpenAI
 
 # Import your environments
 from env import TrafficSignalEnv, EmailSortEnv, MultiIntersectionEnv
 
-# Environment variables
-API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
-MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
-HF_TOKEN = os.getenv("HF_TOKEN")
+# ✅ REQUIRED ENV VARIABLES (Hackathon injects these)
+API_BASE_URL = os.environ["API_BASE_URL"]
+API_KEY = os.environ["API_KEY"]
+MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4")
 
-# Safe OpenAI client init (optional)
-try:
-    if HF_TOKEN:
-        from openai import OpenAI
-        client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
-    else:
-        print("[WARN] HF_TOKEN not set, skipping OpenAI client init", flush=True)
-        client = None
-except Exception as e:
-    print(f"[ERROR] OpenAI client init failed: {e}", flush=True)
-    client = None
+# ✅ OpenAI client (MANDATORY for validation)
+client = OpenAI(
+    base_url=API_BASE_URL,
+    api_key=API_KEY
+)
 
 # FastAPI app
 app = FastAPI()
 
-# ✅ STARTUP EVENT (VERY IMPORTANT FOR HACKATHON)
+# ✅ Startup event (runs tasks automatically)
 @app.on_event("startup")
 async def startup_event():
     print("===== Application Startup =====", flush=True)
@@ -58,29 +53,45 @@ async def reset_endpoint(request: Request):
     task_id = data.get("task_id") or data.get("task") or "TrafficSignal"
 
     if task_id not in env_map:
-        return {
-            "status": "error",
-            "task": task_id,
-            "message": f"Unknown task_id {task_id}"
-        }
+        return {"status": "error", "task": task_id, "message": f"Unknown task_id {task_id}"}
 
     try:
         env = env_map[task_id]()
         state, _ = env.reset()
         env.close()
+        return {"status": "ok", "task": task_id, "state": state.tolist()}
+    except Exception as e:
+        return {"status": "error", "task": task_id, "message": str(e)}
 
-        return {
-            "status": "ok",
-            "task": task_id,
-            "state": state.tolist()
-        }
+
+def get_action_from_llm(state, action_space_n):
+    """
+    Call LLM to decide action
+    """
+    try:
+        prompt = f"""
+You are an RL agent.
+State: {state.tolist()}
+Return ONLY a number between 0 and {action_space_n - 1}.
+"""
+
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=5
+        )
+
+        action = int(response.choices[0].message.content.strip())
+
+        # Safety clamp
+        if action < 0 or action >= action_space_n:
+            action = np.random.randint(0, action_space_n)
 
     except Exception as e:
-        return {
-            "status": "error",
-            "task": task_id,
-            "message": str(e)
-        }
+        print(f"[ERROR] LLM failed: {e}", flush=True)
+        action = np.random.randint(0, action_space_n)
+
+    return action
 
 
 def run_task(task_name="TrafficSignal"):
@@ -89,18 +100,12 @@ def run_task(task_name="TrafficSignal"):
     if env_class is None:
         print(f"[START] task={task_name} error=Unknown task", flush=True)
         print(f"[END] success=false steps=0 rewards=", flush=True)
-        return {
-            "task": task_name,
-            "steps": 0,
-            "success": False,
-            "error": "Unknown task"
-        }
+        return
 
     rewards = []
     steps = 0
     success = False
 
-    # START block
     print(f"[START] task={task_name} env={task_name.lower()} model={MODEL_NAME}", flush=True)
 
     try:
@@ -109,7 +114,8 @@ def run_task(task_name="TrafficSignal"):
         done = False
 
         while not done:
-            action = env.action_space.sample()
+            # ✅ LLM-based action
+            action = get_action_from_llm(state, env.action_space.n)
 
             next_state, reward, done, truncated, info = env.step(action)
 
@@ -119,7 +125,6 @@ def run_task(task_name="TrafficSignal"):
             steps += 1
             rewards.append(float(reward))
 
-            # STEP block
             print(
                 f"[STEP] step={steps} action={action} reward={reward:.2f} "
                 f"done={str(done).lower()} error=null",
@@ -142,25 +147,19 @@ def run_task(task_name="TrafficSignal"):
 
         rewards_str = ",".join(f"{r:.2f}" for r in rewards)
 
-        # END block
         print(
             f"[END] success={str(success).lower()} steps={steps} rewards={rewards_str}",
             flush=True
         )
 
-    return {
-        "task": task_name,
-        "steps": steps,
-        "success": success
-    }
+    return {"task": task_name, "steps": steps, "success": success}
 
 
-# Optional (safe fallback, not used in Docker)
+# Optional fallback
 if __name__ == "__main__":
     run_task("TrafficSignal")
     run_task("EmailSort")
     run_task("MultiIntersection")
-
     # ❌ DO NOT START UVICORN HERE
     # HuggingFace / validator khud server start karega
 
