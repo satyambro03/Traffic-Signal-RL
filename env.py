@@ -1,155 +1,102 @@
-import os
+import gymnasium as gym
+from gymnasium import spaces
 import numpy as np
-from fastapi import FastAPI, Request
 
-from env import TrafficSignalEnv, EmailSortEnv, MultiIntersectionEnv
+# ==========================================
+# 1. Traffic Signal Environment
+# ==========================================
+class TrafficSignalEnv(gym.Env):
+    def __init__(self):
+        super().__init__()
 
-# ==============================
-# ENV VARIABLES
-# ==============================
-API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
-MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
-HF_TOKEN = os.getenv("HF_TOKEN")
+        self.observation_space = spaces.Box(low=0, high=10, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Discrete(2)
 
-client = None
+        self.state = None
 
-# ✅ LLM client init
-try:
-    if HF_TOKEN:
-        from openai import OpenAI
-        client = OpenAI(
-            base_url=API_BASE_URL,
-            api_key=HF_TOKEN
-        )
-except:
-    client = None
+    def reset(self, seed=None, options=None):
+        self.state = np.random.randint(0, 10, size=(4,), dtype=np.float32)
+        return self.state, {}
 
-# ==============================
-# FASTAPI APP
-# ==============================
-app = FastAPI()
+    def step(self, action):
+        truncated = False
+        done = True   # single-step episode
 
-env_map = {
-    "TrafficSignal": TrafficSignalEnv,
-    "EmailSort": EmailSortEnv,
-    "MultiIntersection": MultiIntersectionEnv
-}
+        traffic_load = np.sum(self.state)
 
-# ==============================
-# RESET ENDPOINT
-# ==============================
-@app.post("/reset")
-async def reset_endpoint(request: Request):
-    try:
-        data = await request.json()
-    except:
-        data = {}
+        # RL logic: high traffic → green (1)
+        if traffic_load > 15 and action == 1:
+            reward = 0.9
+        else:
+            reward = 0.1
 
-    task = data.get("task", "TrafficSignal")
+        return self.state, reward, done, truncated, {}
 
-    if task not in env_map:
-        return {"status": "error"}
+    def close(self):
+        pass
 
-    env = env_map[task]()
-    state, _ = env.reset()
-    env.close()
 
-    return {
-        "status": "ok",
-        "task": task,
-        "state": state.tolist()
-    }
+# ==========================================
+# 2. Email Sorting Environment
+# ==========================================
+class EmailSortEnv(gym.Env):
+    def __init__(self):
+        super().__init__()
 
-# ==============================
-# ACTION FUNCTION (LLM + fallback)
-# ==============================
-def get_action(state, action_space_n):
-    if client:
-        try:
-            # 🔥 REQUIRED LLM CALL
-            client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=[{
-                    "role": "user",
-                    "content": f"State: {state.tolist()} return number"
-                }],
-                max_tokens=5
-            )
-        except:
-            pass
+        self.observation_space = spaces.Box(low=0, high=1, shape=(3,), dtype=np.float32)
+        self.action_space = spaces.Discrete(3)
 
-    return np.random.randint(0, action_space_n)
+        self.state = None
+        self.correct_label = None
 
-# ==============================
-# TASK RUNNER (STEP GUARANTEED)
-# ==============================
-def run_task(task_name):
-    print(f"[START] task={task_name} env={task_name.lower()} model={MODEL_NAME}", flush=True)
+    def reset(self, seed=None, options=None):
+        self.state = np.random.rand(3).astype(np.float32)
+        self.correct_label = np.random.randint(0, 3)
+        return self.state, {}
 
-    steps = 0
+    def step(self, action):
+        truncated = False
+        done = True   # single-step
 
-    try:
-        env = env_map[task_name]()
-        state, _ = env.reset()
+        if action == self.correct_label:
+            reward = 0.9
+        else:
+            reward = 0.1
 
-        # 🔥 FORCE EXACTLY 1 STEP
-        action = get_action(state, env.action_space.n)
+        return self.state, reward, done, truncated, {}
 
-        next_state, reward, done, truncated, _ = env.step(action)
+    def close(self):
+        pass
 
-        steps = 1
 
-        # ✅ RL mapping
-        safe_reward = 0.9 if reward > 0 else 0.1
+# ==========================================
+# 3. Multi Intersection Environment
+# ==========================================
+class MultiIntersectionEnv(gym.Env):
+    def __init__(self):
+        super().__init__()
 
-        print(
-            f"[STEP] step=1 action={action} reward={safe_reward:.2f} done=true error=null",
-            flush=True
-        )
+        self.observation_space = spaces.Box(low=0, high=20, shape=(6,), dtype=np.float32)
+        self.action_space = spaces.Discrete(6)
 
-    except:
-        steps = 1
-        safe_reward = 0.5
+        self.state = None
 
-        print(
-            f"[STEP] step=1 action=0 reward=0.50 done=true error=null",
-            flush=True
-        )
+    def reset(self, seed=None, options=None):
+        self.state = np.random.randint(0, 20, size=(6,), dtype=np.float32)
+        return self.state, {}
 
-    finally:
-        try:
-            env.close()
-        except:
-            pass
+    def step(self, action):
+        truncated = False
+        done = True   # single-step
 
-        # ✅ rewards list format
-        rewards_str = f"{safe_reward:.2f}"
+        best_action = np.argmax(self.state)
 
-        print(
-            f"[END] success=true steps={steps} rewards={rewards_str}",
-            flush=True
-        )
+        if action == best_action:
+            reward = 0.9
+        else:
+            reward = 0.1
 
-# ==============================
-# FASTAPI STARTUP
-# ==============================
-@app.on_event("startup")
-async def startup_event():
-    run_task("TrafficSignal")
-    run_task("EmailSort")
-    run_task("MultiIntersection")
+        return self.state, reward, done, truncated, {}
 
-# ==============================
-# ROOT
-# ==============================
-@app.get("/")
-async def root():
-    return {"status": "running"}
-
-# ==============================
-# VALIDATOR EXECUTION
-# ==============================
-if __name__ == "__main__":
-    run_task("TrafficSignal")
-    run_task("EmailSort")
-    run_task("MultiIntersection")
+    def close(self):
+        pass
