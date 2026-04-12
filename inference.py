@@ -4,13 +4,16 @@ from fastapi import FastAPI, Request
 
 from env import TrafficSignalEnv, EmailSortEnv, MultiIntersectionEnv
 
+# ==============================
+# ENV VARIABLES
+# ==============================
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
 HF_TOKEN = os.getenv("HF_TOKEN")
 
 client = None
 
-# LLM client
+# LLM client init
 try:
     if HF_TOKEN:
         from openai import OpenAI
@@ -27,7 +30,7 @@ env_map = {
 }
 
 # ==============================
-# RESET
+# RESET ENDPOINT
 # ==============================
 @app.post("/reset")
 async def reset_endpoint(request: Request):
@@ -86,7 +89,7 @@ def run_task(task_name):
             except:
                 reward = 0.5
 
-            # 🔥 FINAL SAFE MAPPING
+            # SAFE MAPPING
             if reward < 0.5:
                 safe_reward = 0.3
             else:
@@ -115,10 +118,16 @@ def run_task(task_name):
                 flush=True
             )
 
+    # ==============================
+    # FINAL END (DYNAMIC SUCCESS)
+    # ==============================
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
 
+    avg_score = sum(rewards) / len(rewards)
+    success_flag = "true" if avg_score > 0.2 else "false"
+
     print(
-        f"[END] success=true steps={steps} rewards={rewards_str}",
+        f"[END] success={success_flag} steps={steps} rewards={rewards_str}",
         flush=True
     )
 
