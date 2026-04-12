@@ -6,7 +6,7 @@ from fastapi import FastAPI, Request
 from env import TrafficSignalEnv, EmailSortEnv, MultiIntersectionEnv
 
 # ==============================
-# ✅ ENV VARIABLES (SAFE)
+# ENV VARIABLES (SAFE)
 # ==============================
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
@@ -14,7 +14,7 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 
 client = None
 
-# ✅ Safe OpenAI client init
+# Safe LLM client
 try:
     if HF_TOKEN:
         from openai import OpenAI
@@ -24,13 +24,13 @@ try:
         )
         print("[INFO] LLM client initialized", flush=True)
     else:
-        print("[WARN] HF_TOKEN missing, running without LLM", flush=True)
+        print("[WARN] HF_TOKEN missing, fallback mode", flush=True)
 except Exception as e:
     print(f"[ERROR] Client init failed: {e}", flush=True)
     client = None
 
 # ==============================
-# ✅ FASTAPI APP
+# FASTAPI APP
 # ==============================
 app = FastAPI()
 
@@ -41,7 +41,7 @@ env_map = {
 }
 
 # ==============================
-# ✅ RESET ENDPOINT (MANDATORY)
+# RESET ENDPOINT
 # ==============================
 @app.post("/reset")
 async def reset_endpoint(request: Request):
@@ -66,7 +66,7 @@ async def reset_endpoint(request: Request):
     }
 
 # ==============================
-# ✅ LLM ACTION (SAFE FALLBACK)
+# ACTION FUNCTION (LLM + FALLBACK)
 # ==============================
 def get_action(state, action_space_n):
     if client is None:
@@ -77,7 +77,7 @@ def get_action(state, action_space_n):
             model=MODEL_NAME,
             messages=[{
                 "role": "user",
-                "content": f"State: {state.tolist()} Return action 0 to {action_space_n-1}"
+                "content": f"State: {state.tolist()} return number 0 to {action_space_n-1}"
             }],
             max_tokens=5
         )
@@ -94,7 +94,7 @@ def get_action(state, action_space_n):
     return action
 
 # ==============================
-# ✅ MAIN TASK RUNNER
+# MAIN TASK RUNNER
 # ==============================
 def run_task(task_name):
     rewards = []
@@ -147,7 +147,7 @@ def run_task(task_name):
         )
 
 # ==============================
-# ✅ STARTUP EVENT
+# FASTAPI STARTUP (HF UI)
 # ==============================
 @app.on_event("startup")
 async def startup_event():
@@ -158,12 +158,15 @@ async def startup_event():
     run_task("MultiIntersection")
 
 # ==============================
-# ✅ ROOT ENDPOINT
+# ROOT ENDPOINT
 # ==============================
 @app.get("/")
 async def root():
     return {"status": "running"}
 
+# ==============================
+# IMPORTANT: DIRECT EXECUTION (VALIDATOR)
+# ==============================
 if __name__ == "__main__":
     print("===== Direct Execution Mode =====", flush=True)
 
