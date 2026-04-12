@@ -105,6 +105,9 @@ if __name__ == "__main__":
     run_task("EmailSort")
     run_task("MultiIntersection")
 
-    import uvicorn, os
-    port = int(os.getenv("PORT", 7860))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    # ❌ DO NOT START UVICORN HERE
+    # HuggingFace / validator khud server start karega
+
+    # import uvicorn, os
+    # port = int(os.getenv("PORT", 7860))
+    # uvicorn.run(app, host="0.0.0.0", port=port)
