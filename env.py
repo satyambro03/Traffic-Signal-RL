@@ -3,7 +3,7 @@ from gymnasium import spaces
 import numpy as np
 
 # ==========================================
-# Traffic Signal
+# Traffic Signal Environment
 # ==========================================
 class TrafficSignalEnv(gym.Env):
     def __init__(self):
@@ -30,7 +30,7 @@ class TrafficSignalEnv(gym.Env):
 
 
 # ==========================================
-# Email Sort
+# Email Sort Environment
 # ==========================================
 class EmailSortEnv(gym.Env):
     def __init__(self):
@@ -56,7 +56,7 @@ class EmailSortEnv(gym.Env):
 
 
 # ==========================================
-# Multi Intersection
+# Multi Intersection Environment
 # ==========================================
 class MultiIntersectionEnv(gym.Env):
     def __init__(self):
