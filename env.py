@@ -3,14 +3,11 @@ from gymnasium import spaces
 import numpy as np
 
 
-# ==========================================
-# Traffic Signal
-# ==========================================
 class TrafficSignalEnv(gym.Env):
     def __init__(self):
         super().__init__()
         self.observation_space = spaces.Box(low=0, high=20, shape=(4,), dtype=np.float32)
-        self.action_space = spaces.Discrete(3)   # ✅ FIXED
+        self.action_space = spaces.Discrete(3)
         self.steps = 0
 
     def reset(self, seed=None, options=None):
@@ -21,9 +18,7 @@ class TrafficSignalEnv(gym.Env):
     def step(self, action):
         self.steps += 1
         traffic = np.sum(self.state)
-
         reward = 0.9 if (traffic > 15 and action == 1) else 0.1
-
         done = self.steps >= 3
         return self.state, reward, done, False, {}
 
@@ -31,13 +26,10 @@ class TrafficSignalEnv(gym.Env):
         pass
 
 
-# ==========================================
-# Email Sort
-# ==========================================
 class EmailSortEnv(gym.Env):
     def __init__(self):
         super().__init__()
-        self.observation_space = spaces.Box(low=0, high=1, shape=(10,), dtype=np.float32)  # ✅ FIXED
+        self.observation_space = spaces.Box(low=0, high=1, shape=(10,), dtype=np.float32)
         self.action_space = spaces.Discrete(3)
 
     def reset(self, seed=None, options=None):
@@ -48,23 +40,18 @@ class EmailSortEnv(gym.Env):
 
     def step(self, action):
         self.steps += 1
-
         reward = 0.9 if action == self.correct else 0.1
         done = self.steps >= 3
-
         return self.state, reward, done, False, {}
 
     def close(self):
         pass
 
 
-# ==========================================
-# Multi Intersection
-# ==========================================
 class MultiIntersectionEnv(gym.Env):
     def __init__(self):
         super().__init__()
-        self.observation_space = spaces.Box(low=0, high=50, shape=(8,), dtype=np.float32)  # ✅ FIXED
+        self.observation_space = spaces.Box(low=0, high=50, shape=(8,), dtype=np.float32)
         self.action_space = spaces.Discrete(6)
 
     def reset(self, seed=None, options=None):
@@ -74,12 +61,9 @@ class MultiIntersectionEnv(gym.Env):
 
     def step(self, action):
         self.steps += 1
-
         best = np.argmax(self.state[:6])
         reward = 0.9 if action == best else 0.1
-
         done = self.steps >= 3
-
         return self.state, reward, done, False, {}
 
     def close(self):
