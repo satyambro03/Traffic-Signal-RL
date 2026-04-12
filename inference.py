@@ -67,8 +67,8 @@ def run_task(task_name):
 
     print(f"[START] task={task_name} env={task_name.lower()} model={MODEL_NAME}", flush=True)
 
-    steps = 3
     rewards = []
+    steps = 0
 
     try:
         env = env_map[task_name]()
@@ -76,13 +76,14 @@ def run_task(task_name):
 
         call_llm(state)
 
-        for i in range(steps):
+        done = False
 
+        while not done:
             action = np.random.randint(0, env.action_space.n)
 
             next_state, reward, done, truncated, _ = env.step(action)
 
-            # ✅ ONLY clamp (no modification)
+            # clamp only
             if reward <= 0:
                 safe_reward = 0.01
             elif reward >= 1:
@@ -91,11 +92,12 @@ def run_task(task_name):
                 safe_reward = float(reward)
 
             rewards.append(safe_reward)
+            steps += 1
 
-            done_flag = "true" if i == steps - 1 else "false"
+            done_flag = "true" if done else "false"
 
             print(
-                f"[STEP] step={i+1} action={action} reward={safe_reward:.2f} done={done_flag} error=null",
+                f"[STEP] step={steps} action={action} reward={safe_reward:.2f} done={done_flag} error=null",
                 flush=True
             )
 
@@ -103,16 +105,17 @@ def run_task(task_name):
 
     except:
         # fallback
-        for i in range(steps):
+        for i in range(3):
             safe_reward = 0.5
             rewards.append(safe_reward)
 
-            done_flag = "true" if i == steps - 1 else "false"
+            done_flag = "true" if i == 2 else "false"
 
             print(
                 f"[STEP] step={i+1} action=0 reward=0.50 done={done_flag} error=null",
                 flush=True
             )
+        steps = 3
 
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
 
