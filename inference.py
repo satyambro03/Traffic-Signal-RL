@@ -3,87 +3,55 @@ import numpy as np
 from fastapi import FastAPI, Request
 from openai import OpenAI
 
-# Import your environments
+# Import environments
 from env import TrafficSignalEnv, EmailSortEnv, MultiIntersectionEnv
 
-# ✅ REQUIRED ENV VARIABLES (Hackathon injects these)
-API_BASE_URL = os.environ["API_BASE_URL"]
-API_KEY = os.environ["API_KEY"]
-MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4")
+# ==============================
+# ✅ ENV VARIABLES (MANDATORY)
+# ==============================
+API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
+MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
+HF_TOKEN = os.getenv("HF_TOKEN")
 
-# ✅ OpenAI client (MANDATORY for validation)
+if HF_TOKEN is None:
+    raise ValueError("HF_TOKEN environment variable is required")
+
+# ✅ OpenAI Client
 client = OpenAI(
     base_url=API_BASE_URL,
-    api_key=API_KEY
+    api_key=HF_TOKEN
 )
 
-# FastAPI app
+# ==============================
+# ✅ FASTAPI APP
+# ==============================
 app = FastAPI()
 
-# ✅ Startup event (runs tasks automatically)
-@app.on_event("startup")
-async def startup_event():
-    print("===== Application Startup =====", flush=True)
-
-    run_task("TrafficSignal")
-    run_task("EmailSort")
-    run_task("MultiIntersection")
-
-
-@app.get("/")
-async def root():
-    return {"status": "running", "message": "FastAPI server is live. Use POST /reset."}
-
-
-# Map tasks to envs
+# Map environments
 env_map = {
     "TrafficSignal": TrafficSignalEnv,
     "EmailSort": EmailSortEnv,
     "MultiIntersection": MultiIntersectionEnv
 }
 
-
-@app.post("/reset")
-async def reset_endpoint(request: Request):
-    try:
-        data = await request.json()
-    except Exception:
-        data = {}
-
-    task_id = data.get("task_id") or data.get("task") or "TrafficSignal"
-
-    if task_id not in env_map:
-        return {"status": "error", "task": task_id, "message": f"Unknown task_id {task_id}"}
-
-    try:
-        env = env_map[task_id]()
-        state, _ = env.reset()
-        env.close()
-        return {"status": "ok", "task": task_id, "state": state.tolist()}
-    except Exception as e:
-        return {"status": "error", "task": task_id, "message": str(e)}
-
-
+# ==============================
+# ✅ LLM ACTION FUNCTION
+# ==============================
 def get_action_from_llm(state, action_space_n):
-    """
-    Call LLM to decide action
-    """
     try:
-        prompt = f"""
-You are an RL agent.
-State: {state.tolist()}
-Return ONLY a number between 0 and {action_space_n - 1}.
-"""
-
         response = client.chat.completions.create(
             model=MODEL_NAME,
-            messages=[{"role": "user", "content": prompt}],
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"State: {state.tolist()}. Return ONLY integer between 0 and {action_space_n-1}"
+                }
+            ],
             max_tokens=5
         )
 
         action = int(response.choices[0].message.content.strip())
 
-        # Safety clamp
         if action < 0 or action >= action_space_n:
             action = np.random.randint(0, action_space_n)
 
@@ -94,30 +62,27 @@ Return ONLY a number between 0 and {action_space_n - 1}.
     return action
 
 
-def run_task(task_name="TrafficSignal"):
-    env_class = env_map.get(task_name)
-
-    if env_class is None:
-        print(f"[START] task={task_name} error=Unknown task", flush=True)
-        print(f"[END] success=false steps=0 rewards=", flush=True)
-        return
+# ==============================
+# ✅ RUN TASK FUNCTION
+# ==============================
+def run_task(task_name):
+    env = env_map[task_name]()
 
     rewards = []
     steps = 0
     success = False
 
+    # START LOG
     print(f"[START] task={task_name} env={task_name.lower()} model={MODEL_NAME}", flush=True)
 
     try:
-        env = env_class()
         state, _ = env.reset()
         done = False
 
         while not done:
-            # ✅ LLM-based action
             action = get_action_from_llm(state, env.action_space.n)
 
-            next_state, reward, done, truncated, info = env.step(action)
+            next_state, reward, done, truncated, _ = env.step(action)
 
             if truncated:
                 done = True
@@ -125,6 +90,7 @@ def run_task(task_name="TrafficSignal"):
             steps += 1
             rewards.append(float(reward))
 
+            # STEP LOG
             print(
                 f"[STEP] step={steps} action={action} reward={reward:.2f} "
                 f"done={str(done).lower()} error=null",
@@ -134,35 +100,38 @@ def run_task(task_name="TrafficSignal"):
             state = next_state
 
         score = float(np.mean(rewards)) if rewards else 0.0
-        success = score >= 0.1
+        success = score > 0
 
     except Exception as e:
-        print(f"[ERROR] run_task failed: {e}", flush=True)
+        print(f"[ERROR] {e}", flush=True)
 
     finally:
-        try:
-            env.close()
-        except:
-            pass
+        env.close()
 
         rewards_str = ",".join(f"{r:.2f}" for r in rewards)
 
+        # END LOG
         print(
             f"[END] success={str(success).lower()} steps={steps} rewards={rewards_str}",
             flush=True
         )
 
-    return {"task": task_name, "steps": steps, "success": success}
 
+# ==============================
+# ✅ STARTUP EVENT (AUTO RUN)
+# ==============================
+@app.on_event("startup")
+async def startup_event():
+    print("===== Application Startup =====", flush=True)
 
-# Optional fallback
-if __name__ == "__main__":
     run_task("TrafficSignal")
     run_task("EmailSort")
     run_task("MultiIntersection")
-    # ❌ DO NOT START UVICORN HERE
-    # HuggingFace / validator khud server start karega
 
-    # import uvicorn, os
-    # port = int(os.getenv("PORT", 7860))
-    # uvicorn.run(app, host="0.0.0.0", port=port)
+
+# ==============================
+# ✅ OPTIONAL ROOT ENDPOINT
+# ==============================
+@app.get("/")
+async def root():
+    return {"status": "running"}
