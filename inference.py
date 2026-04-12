@@ -163,3 +163,10 @@ async def startup_event():
 @app.get("/")
 async def root():
     return {"status": "running"}
+
+if __name__ == "__main__":
+    print("===== Direct Execution Mode =====", flush=True)
+
+    run_task("TrafficSignal")
+    run_task("EmailSort")
+    run_task("MultiIntersection")
