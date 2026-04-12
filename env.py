@@ -19,11 +19,11 @@ class TrafficSignalEnv(gym.Env):
 
     def step(self, action):
         self.steps += 1
-        traffic = np.sum(self.state)
 
+        traffic = np.sum(self.state)
         reward = 0.9 if (traffic > 15 and action == 1) else 0.1
 
-        done = self.steps >= 3   # 🔥 FIX
+        done = self.steps >= 3   # multi-step
 
         return self.state, reward, done, False, {}
 
@@ -50,7 +50,7 @@ class EmailSortEnv(gym.Env):
         self.steps += 1
 
         reward = 0.9 if action == self.correct else 0.1
-        done = self.steps >= 3   # 🔥 FIX
+        done = self.steps >= 3
 
         return self.state, reward, done, False, {}
 
@@ -78,7 +78,7 @@ class MultiIntersectionEnv(gym.Env):
         best = np.argmax(self.state)
         reward = 0.9 if action == best else 0.1
 
-        done = self.steps >= 3   # 🔥 FIX
+        done = self.steps >= 3
 
         return self.state, reward, done, False, {}
 
