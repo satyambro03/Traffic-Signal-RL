@@ -4,16 +4,13 @@ from fastapi import FastAPI, Request
 
 from env import TrafficSignalEnv, EmailSortEnv, MultiIntersectionEnv
 
-# ==============================
-# ENV VARIABLES
-# ==============================
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
 HF_TOKEN = os.getenv("HF_TOKEN")
 
 client = None
 
-# LLM client init
+# LLM init
 try:
     if HF_TOKEN:
         from openai import OpenAI
@@ -30,7 +27,7 @@ env_map = {
 }
 
 # ==============================
-# RESET ENDPOINT
+# RESET
 # ==============================
 @app.post("/reset")
 async def reset_endpoint(request: Request):
@@ -44,9 +41,8 @@ async def reset_endpoint(request: Request):
     try:
         env = env_map[task]()
         state, _ = env.reset()
-        state = state.tolist()
         env.close()
-        return {"status": "ok", "state": state}
+        return {"status": "ok", "state": state.tolist()}
     except:
         return {"status": "error"}
 
@@ -84,12 +80,9 @@ def run_task(task_name):
 
             action = np.random.randint(0, env.action_space.n)
 
-            try:
-                next_state, reward, done, truncated, _ = env.step(action)
-            except:
-                reward = 0.5  # fallback only
+            next_state, reward, done, truncated, _ = env.step(action)
 
-            # 🔥 ONLY CLAMP (no remapping)
+            # ✅ ONLY clamp (no modification)
             if reward <= 0:
                 safe_reward = 0.01
             elif reward >= 1:
