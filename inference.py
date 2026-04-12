@@ -136,7 +136,6 @@ async def startup_event():
 async def root():
     return {"status": "running"}
 
-
 @app.post("/reset")
 async def reset_endpoint(request: Request):
     try:
