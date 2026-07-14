@@ -159,3 +159,4 @@ if __name__ == "__main__":
     run_task("TrafficSignal")
     run_task("EmailSort")
     run_task("MultiIntersection")
+
