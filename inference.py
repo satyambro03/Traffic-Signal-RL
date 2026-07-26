@@ -16,11 +16,7 @@ MODEL_NAME = "gpt-4.1-mini"
 client = None
 
 # ✅ LLM INIT (MANDATORY)
-if API_BASE_URL and API_KEY:
-    client = OpenAI(
-        base_url=API_BASE_URL,
-        api_key=API_KEY
-    )
+
 
 # ==============================
 # LLM CALL
