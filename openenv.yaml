@@ -26,17 +26,4 @@ tasks:
     task_description: Agent controls a single traffic signal to reduce jams.
 
 
-  - name: MultiIntersection
-    action_space:
-      type: Discrete
-      size: 6
-      description: Control multiple signals simultaneously
-    observation_space:
-      type: Box
-      shape: [8]
-      low: 0
-      high: 50
-      dtype: int
-    task_description: Agent optimizes multiple intersections during rush hour.
-
-    # This is Openenv
+ 
