@@ -1,1 +1,2 @@
-Try
+pip install uv
+uv lock
