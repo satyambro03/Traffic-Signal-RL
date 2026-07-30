@@ -1,6 +1,4 @@
-fastapi
-uvicorn
-openai
+
 gymnasium
 numpy
 pyyaml
