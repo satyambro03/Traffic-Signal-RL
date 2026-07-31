@@ -25,6 +25,7 @@ class TrafficSignalEnv(gym.Env):
     def close(self):
         pass
 
+
 class EmailSortEnv(gym.Env):
     def __init__(self):
         super().__init__()
