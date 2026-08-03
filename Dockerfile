@@ -13,4 +13,4 @@ EXPOSE 7860
 
 # For demo mode (Gradio UI) - commented out
 CMD ["python", "ui_inference.py"]
-CMD ["python", "-m", "server.app"]
+# CMD ["python", "-m", "server.app"]
