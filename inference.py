@@ -6,6 +6,7 @@ from openai import OpenAI
 
 from env import TrafficSignalEnv, EmailSortEnv, MultiIntersectionEnv
 
+
 # ==============================
 # ENV VARIABLES
 # ==============================
@@ -15,6 +16,7 @@ MODEL_NAME = "gpt-4.1-mini"
 
 client = None
 
+
 # ✅ LLM INIT (MANDATORY)
 
 
@@ -23,6 +25,7 @@ if API_BASE_URL and API_KEY:
         base_url=API_BASE_URL,
         api_key=API_KEY
     )
+
 
 # ==============================
 # LLM CALL
@@ -57,6 +60,7 @@ env_map = {
     "EmailSort": EmailSortEnv,
     "MultiIntersection": MultiIntersectionEnv
 }
+
 
 
 # ==============================
