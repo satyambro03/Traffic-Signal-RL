@@ -24,7 +24,6 @@ if API_BASE_URL and API_KEY:
         api_key=API_KEY
     )
 
-
 # ==============================
 # LLM CALL
 # ==============================
