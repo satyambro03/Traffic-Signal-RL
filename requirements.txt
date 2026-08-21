@@ -1,1 +1,15 @@
-nvv
+
+fastapi
+uvicorn
+openai
+gymnasium
+numpy
+pyyaml
+gradio
+huggingface_hub==0.23.0
+openenv
+
+
+
+
+
