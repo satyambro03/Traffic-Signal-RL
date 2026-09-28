@@ -61,12 +61,12 @@ class MultiIntersectionEnv(gym.Env):
         self.steps = 0
         return self.state, {}
 
-    def step(self, action):
-        self.steps += 1
-        best = np.argmax(self.state[:6])
-        reward = 0.9 if action == best else 0.1
-        done = self.steps >= 3
-        return self.state, reward, done, False, {}
+    # def step(self, action):
+    #     self.steps += 1
+    #     best = np.argmax(self.state[:6])
+    #     reward = 0.9 if action == best else 0.1
+    #     done = self.steps >= 3
+    #     return self.state, reward, done, False, {}
 
     def close(self):
         pass
